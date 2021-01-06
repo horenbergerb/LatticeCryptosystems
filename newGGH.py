@@ -2,6 +2,7 @@ import numpy as np
 import secrets
 from math import isclose
 from Utilities import hadamard_ratio, gcd, ext_gcd, rand_GLNZ, babai
+from Cryptosystem import Cryptosystem
 
 #Notes:
 #the noise, r_int, seems extremely touchy. consider a better way to tune this
@@ -17,6 +18,13 @@ from Utilities import hadamard_ratio, gcd, ext_gcd, rand_GLNZ, babai
 class GGHSystem():
     def __init__(self, chars=1, r_rad = 0.5):
         self.dims = (8*chars)
+        
+        self.reinitialize()
+        
+        self.r_rad = r_rad
+        self.noise_generator = secrets.SystemRandom()
+
+    def reinitialize(self):
         vecs = []
         for cur_dim in range(0,self.dims):
             cur_vec = [0.0]*self.dims
@@ -25,28 +33,23 @@ class GGHSystem():
             vecs.append(cur_vec)
             
         self.good_basis = np.array(vecs)
-        print("Hadamard ratio of good basis: {}".format(hadamard_ratio(self.good_basis)))
         #matrix from good basis to bad basis
         self.in_between = rand_GLNZ(self.dims)
         self.bad_basis = np.matmul(self.in_between, self.good_basis)
-        print("Hadamard ratio of bad basis: {}".format(hadamard_ratio(self.bad_basis)))
         
-        self.r_rad = r_rad
-        self.noise_generator = secrets.SystemRandom()
+    def get_public_key(self):
+        return self.bad_basis
+    def get_private_key(self):
+        return self.good_basis
         
     #by default it assumes the message is a string
-    def encrypt(self, message):
+    def encrypt(self, message, is_binary = True):
         payload = None
-        
-        #message is encoded as a binary vector
-        #string form of binary first
-        payload = ""
-        for x in message:
-            cur_bin = bin(ord(x)).replace('b','')
-            cur_bin = "0"*(8-len(cur_bin)) + cur_bin
-            if len(cur_bin) > 8:
-                raise Exception("Plaintext has invalid characters (must be 0-128 ascii)")
-            payload += cur_bin
+        if not is_binary:
+            payload = self.ascii_to_bin(message)
+        else:
+            payload = message
+
         #now a list of floats
         payload = list(map(float, payload))
 
@@ -55,7 +58,8 @@ class GGHSystem():
             raise Exception("Message to be encoded by encrypt() is longer than dimensions allow")
         while len(payload) < self.dims:
             payload.append(1.0)
-                    
+
+            
         #linear combination of bad basis vectors
         scrambled = np.matmul(payload, self.bad_basis)
 
@@ -65,7 +69,7 @@ class GGHSystem():
             
         return scrambled
 
-    def decrypt(self, ciphertext):
+    def decrypt(self, ciphertext, to_binary = True):
         good_ciphertext = babai(ciphertext, self.good_basis)
         #we round here since we expect values of 1 or 0, then convert to an integer array
         raw_plaintext = np.rint(np.matmul(good_ciphertext, np.linalg.inv(self.bad_basis))).astype(np.int)
@@ -73,13 +77,11 @@ class GGHSystem():
         raw_plaintext = map(str, raw_plaintext)
         raw_plaintext = ''.join(raw_plaintext)
 
-        
-        #converting the binary back into a string
-        #not super graceful
-        plaintext = ""
-        for cur in range(0,(len(raw_plaintext)//8)):
-            plaintext += chr(int(raw_plaintext[8*cur: 8*(cur+1)], 2))
-        
+        plaintext = None
+        if not to_binary:
+            plaintext = self.bin_to_ascii(raw_plaintext)
+        else:
+            plaintext = raw_plaintext
         return plaintext
         
     

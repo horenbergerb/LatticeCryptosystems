@@ -4,12 +4,24 @@
 
 Currently working on my Z-Module class. My big to-dos include:
 
-1) Migrate utility functions to their own file
-2) Make utility functions which take instances of Z-Modules rather than raw vectors(such as hadamard, etc)
-3) Generally think about when to make a function vs a method
-4) Implement more basic Z-Module tools (r_stars, transformations, Voronoi)
+1) Make utility functions uniform in what arguments they take
+2) Add Gramm matrix, LLL algorithm, BKZ-LLL, and a selection of good bases for Lattices/Z-Modules to Utilities.py
+3) Implement more basic Z-Module tools (r_stars, covering radius, rank/span/basefield, isLattice)
+4) Implement Lattice class which extends Z-Module
+  - Voronoi cells
+  - Area of fund. domain
+  - Transformations of basis
+  - SVP/CVP, apprSVP/apprCVP
+  - Hermite's constant, Gaussian expected shortest length
 
-I also want to make an implementation of NTRUE. Shouldn't be too hard; just matrix math.
+Other goals:
+* Create abstract crytographic system class
+  - Create complexity analysis methods
+  - Implement GGH using abstract class
+  - Implement NTRU using abstract class
+* Make 2DLattice class which extends Lattice and has visualizations
+* Make 2DZModule class which extends ZModule and has visualizations
+* Alternately make a visualization factory class or something?
 
 ## Theory
 
@@ -19,4 +31,3 @@ Additionally, what happens with the matrix math for Z-modules? Seems like transf
 
 Gonna have to start crunching on that ASAP.
 
-I also want to take some real notes on the quasicrystals book. I should do that soon.
