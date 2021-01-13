@@ -7,14 +7,13 @@ from Utilities import hadamard_ratio, gcd, ext_gcd, rand_GLNZ, babai
 from ZModule import ZModule
 
 ###############
-#ZMODULE CLASS#
+#ZMODULE2D CLASS#
 ###############
 
 class ZModule2D(ZModule):
     #initialized with a list of n-dimensional numpy vectors
     def __init__(self, vectors):
-        self.basis = vectors
-        self.dim = vectors[0].shape[0]
+        super().__init__(vectors)
         if self.dim != 2:
             raise Exception("ZModule2D initialized with vectors not in R^2")
 
@@ -43,7 +42,4 @@ def debug_zmod_plot():
     
     test_mod3 = ZModule2D([np.array([1,0]),np.array([np.cos(2.0*3.14159/5.0),np.sin(3.14159*2.0/5.0)]), np.array([np.sqrt(2.0),np.sqrt(3.0)])])
     test_mod3.plot_points(plot_name = "debuglattice3.png")
-
-debug_zmod_plot()
-
     
