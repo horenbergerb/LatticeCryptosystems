@@ -6,5 +6,4 @@ You can find an implementation of the GGH public key cryptosystem in GGH.py.
 
 Utilities.py contains various mathematical functions used in the other files
 
-ZModule.py is a class which represents a simple ZModule
-it will be extended by the Lattice class
+Currently undergoing some restructuring. Expect nice bubble diagrams of classes soon.
